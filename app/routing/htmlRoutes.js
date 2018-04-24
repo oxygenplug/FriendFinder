@@ -46,11 +46,13 @@ app.post("/api/users", function(req, res) {
 
 //handles the GET requests using the auto generated userid as the key to pass into the URL
 app.get("/api/friends/match/:userId", function(req, res) {
-// sets users to the list of users stored in localstorage
+// sets users to the list of users returned via the getUsers function
+//
   var users = getUsers();
   var userId = req.params.userId;
   var userIndex;
 
+  // finds current user in the array of users to ensure they do not match themslves 
   var currentUser = users.find(function(val, index) {
     if (val.id == userId) {
       userIndex = index;
@@ -121,11 +123,13 @@ function addUser(newUser) {
 }
 
 function getUsers() {
+    //commenting out localstorage solution to use serverside solution instead
   //return storage.getItem("users");
   return usersList;
 }
 
 function setUsers(users) {
+    //commenting out localstorage solution to use serverside solution instead
   //storage.setItem("users", users);
   usersList.push(users);
 }
