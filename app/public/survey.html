@@ -56,7 +56,7 @@
 
 
         <h3>
-            <strong>You like all types of music</strong>
+            <strong>Question 3</strong>
         </h3>
         <h4>You find it easy to stay relaxed and focused even when there is some pressure.</h4>
         <select class="chosen-select" id="q3">
@@ -86,7 +86,6 @@
         <h3>
             <strong>Pick your favorite food out of the provided options</strong>
         </h3>
-        <h4>People can rarely upset you.</h4>
         <select class="chosen-select" id="q5">
             <option value=""></option>
             <option value="1">Pizza</option>
@@ -184,7 +183,6 @@
                 </div>
                 <div class="modal-body">
                     <h2 id="match-name"></h2>
-                    <img id="match-img" src="https://media.licdn.com/mpr/mpr/shrinknp_400_400/p/6/005/064/1bd/3435aa3.jpg" alt="">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -205,13 +203,54 @@
         </footer>
     </div>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <script>
+        $('#submit').on('click', function () {
+            event.preventDefault();
+            var user = {
+                name: $('#name').val().trim(),
+                photo: $('#photo').val().trim(),
+                scores: [$('#q1').val().trim(), $('#q2').val().trim(), $('#q3').val().trim(), $('#q4').val().trim(), $('#q5').val().trim(), $('#q6').val().trim(), $('#q7').val().trim(), $('#q8').val().trim(), $('#q9').val().trim(), $('#q10').val().trim()],
+            };
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ"
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm"
-        crossorigin="anonymous"></script>
+
+            $.post("/api/users", user, function (data) {
+                console.log(data)
+                if (data) {
+                    alert("You've submitted the survey! Sit tight while we find you a friend!");
+                    $.get("api/friends/match/" + data.id, function (data) {
+                    $("match-name").text(data.name);
+                    $("match-img").attr("src", data.photo);   
+                    $("#results-modal").modal("toggle");    
+                    })
+                }
+
+                // If a table is available... tell user they on the waiting list.
+                if (data == false) {
+                    alert("Oops! We encountred an error. Please try again!")
+                }
+                // Clear the form when submitting
+                $('#name').val("");
+                $('#photo').val("");
+                $('#q1').val("");
+                $('#q2').val("");
+                $('#q3').val("");
+                $('#q4').val("");
+                $('#q5').val("");
+                $('#q6').val("");
+                $('#q7').val("");
+                $('#q8').val("");
+                $('#q9').val("");
+                $('#q10').val("");
+            });
+
+
+        });
+    </script>
 </body>
 
 </html>

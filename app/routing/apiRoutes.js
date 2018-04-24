@@ -7,14 +7,28 @@ var path = require("path");
 var app = express();
 var PORT = 3000;
 
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
 var friends = [];
 
 // Sets up the Express app to handle data parsing
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+function Friend(name, photo, scores) {
+  this.name = name;
+  this.photo = "'" + photo + "'";
+  this.scores = scores;
+}
+
+function addFriend(name, photo, scores){
+  var friends = new Friend(name, photo, scores);
+    friends.push(table);
+}
+
 app.get("/api/friends", function(req, res) {
-  res.sendFile(path.join(__dirname + "../data/", "friends.js"));
+  return res.send(friends);
 });
 
 app.post("/api/friends", function(req, res) {
@@ -32,4 +46,7 @@ app.post("/api/friends", function(req, res) {
 
   res.json(newFriend);
 });
- 
+
+app.listen(PORT, function() {
+  console.log("App listening on PORT " + PORT);
+});
