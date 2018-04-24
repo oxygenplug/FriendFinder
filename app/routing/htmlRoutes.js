@@ -10,10 +10,12 @@ storage.setItem("users", []);
 var app = express();
 var PORT = 3000;
 
+var usersList = [];
 // Sets up the Express app to handle data parsing
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+//handles GET responses from the client
 app.get("/", function(req, res) {
   res.sendFile(path.join(__dirname + "/../public/", "home.html"));
 });
@@ -34,6 +36,7 @@ app.get("/api/users", function(req, res) {
   return res.send(users);
 });
 
+//posts the user submitted information to /api/users
 app.post("/api/users", function(req, res) {
   // req.body hosts is equal to the JSON post sent from the user
   // This works because of our body-parser middleware
@@ -41,7 +44,9 @@ app.post("/api/users", function(req, res) {
   res.json(user);
 });
 
+//handles the GET requests using the auto generated userid as the key to pass into the URL
 app.get("/api/friends/match/:userId", function(req, res) {
+// sets users to the list of users stored in localstorage
   var users = getUsers();
   var userId = req.params.userId;
   var userIndex;
@@ -116,11 +121,13 @@ function addUser(newUser) {
 }
 
 function getUsers() {
-  return storage.getItem("users");
+  //return storage.getItem("users");
+  return usersList;
 }
 
 function setUsers(users) {
-  storage.setItem("users", users);
+  //storage.setItem("users", users);
+  usersList.push(users);
 }
 
 app.listen(PORT, function(req, res) {
