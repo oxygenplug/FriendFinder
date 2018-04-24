@@ -1,8 +1,10 @@
 var express = require("express");
 var bodyParser = require("body-parser");
 var path = require("path");
-var storage = require("node-persist");
+var JSONStorage = require("node-localstorage").JSONStorage;
+var storage = new JSONStorage("../data")
 
+storage.setItem("users", [])
 // Sets up the Express App
 // =============================================================
 var app = express();
@@ -11,8 +13,6 @@ var PORT = 3000;
 // Sets up the Express app to handle data parsing
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
-var users = [];
 
 app.get("/", function (req, res) {
     res.sendFile(path.join(__dirname + "/../public/", "home.html"));
@@ -27,7 +27,7 @@ app.get("/survey.html", function (req, res) {
 });
 
 app.get("/api/friends", function (req, res) {
-    return res.send(users);
+    return res.json(getUsers());
 });
 
 app.get("/api/users", function (req, res) {
@@ -37,18 +37,12 @@ app.get("/api/users", function (req, res) {
 app.post("/api/users", function (req, res) {
     // req.body hosts is equal to the JSON post sent from the user
     // This works because of our body-parser middleware
-    var user = new User(req.body);
-    // Using a RegEx Pattern to remove spaces from newCharacter
-    // You can read more about RegEx Patterns later https://www.regexbuddy.com/regex.html
-
-    console.log(user);
-
-    users.push(user);
-    console.log(users);
+    var user = addUser(req.body);
     res.json(user);
 });
 
 app.get("/api/friends/match/:userId", function (req, res) {
+    var users = getUsers();
     var userId = req.params.userId;
     var userIndex;
 
@@ -58,7 +52,8 @@ app.get("/api/friends/match/:userId", function (req, res) {
             return true;
         }
     });
-    var contenders = users.splice(userIndex, 1);
+    users.splice(userIndex, 1);
+    var contenders = users;
 
     var differenceProfiles = [];
 
@@ -89,22 +84,38 @@ app.get("/api/friends/match/:userId", function (req, res) {
             bestMatch = val;
         }
     });
-    return res.json(bestMatch);
+    res.json(bestMatch);
 });
 
-function User(newUser) {
+function User(newUser, id) {
     this.name = newUser.name;
     this.photo = "'" + newUser.photo + "'";
     this.scores = newUser.scores;
-    this.id = users.length;
+    this.id = id;
     this.routeName = newUser.name.replace(/\s+/g, "").toLowerCase();
 }
 
-function DifferenceProfile(name, photo, routeName, difference){
+function DifferenceProfile(name, photo, routeName, difference) {
     this.name = name;
     this.photo = photo;
     this.routeName = routeName;
     this.difference = difference;
+}
+
+function addUser(newUser) {
+    var users = getUsers();
+    var user = new User(newUser, users.length);
+    users.push(user);
+    setUsers(users);
+    return user;
+}
+
+function getUsers() {
+    return storage.getItem("users");
+}
+
+function setUsers(users) {
+    storage.setItem("users", users);
 }
 
 app.listen(PORT, function (req, res) {
