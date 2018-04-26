@@ -1,14 +1,11 @@
 var express = require("express");
 var bodyParser = require("body-parser");
 var path = require("path");
-var JSONStorage = require("node-localstorage").JSONStorage;
-var storage = new JSONStorage("../data");
 
-storage.setItem("users", []);
 // Sets up the Express App
 // =============================================================
 var app = express();
-var PORT = 3000;
+var PORT = process.env.PORT || 3000;
 
 var usersList = [];
 // Sets up the Express app to handle data parsing
